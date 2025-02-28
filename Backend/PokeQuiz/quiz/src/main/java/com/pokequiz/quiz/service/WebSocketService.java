@@ -1,11 +1,15 @@
+
 package com.pokequiz.quiz.service;
 
-import com.pokequiz.quiz.model.Question;
-import com.pokequiz.quiz.model.Room;
+import com.pokequiz.quiz.model.*;
+import com.pokequiz.quiz.repository.PlayerAnswerRepository;
+import com.pokequiz.quiz.repository.PlayerRepository;
+import com.pokequiz.quiz.repository.RoomQuizRepository;
 import com.pokequiz.quiz.repository.RoomRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,13 +23,19 @@ public class WebSocketService {
     private final RoomRepository roomRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final GameService gameService;
+    private final PlayerAnswerRepository playerAnswerRepository;
+    private final RoomQuizRepository roomQuizRepository;
+    private final PlayerRepository playerRepository;
     private final Map<Long, ScheduledExecutorService> roomSchedulers = new ConcurrentHashMap<>();
 
 
-    public WebSocketService(RoomRepository roomRepository, SimpMessagingTemplate messagingTemplate, GameService gameService) {
+    public WebSocketService(RoomRepository roomRepository, SimpMessagingTemplate messagingTemplate, GameService gameService, PlayerAnswerRepository playerAnswerRepository, RoomQuizRepository roomQuizRepository, PlayerRepository playerRepository) {
         this.roomRepository = roomRepository;
         this.messagingTemplate = messagingTemplate;
         this.gameService = gameService;
+        this.playerAnswerRepository = playerAnswerRepository;
+        this.roomQuizRepository = roomQuizRepository;
+        this.playerRepository = playerRepository;
     }
 
 
@@ -53,7 +63,6 @@ public class WebSocketService {
         // Avoid starting multiple schedulers for the same room
         roomSchedulers.computeIfAbsent(roomId, id -> {
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
             System.out.println("Broadcasting started for room " + roomId);
 
             scheduler.scheduleAtFixedRate(() -> {
@@ -64,24 +73,57 @@ public class WebSocketService {
                         stopBroadcasting(roomId);
                         return;
                     }
+
                     Room room = roomOptional.get();
+
                     if (!room.isStarted() || room.isEnded()) {
                         System.out.println("Room is not active. Stopping broadcast for room " + roomId);
                         stopBroadcasting(roomId);
                         return;
                     }
+
+                    if (room.getCurrentRound() >= room.getMaxRound()) {
+                        System.out.println("Max rounds reached. Stopping broadcast for room " + roomId);
+                        endGame(roomId);
+                        stopBroadcasting(roomId);
+                        return;
+                    }
+
+                    // Fetch a random question
                     Question question = gameService.getRandomQuiz();
                     messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/game", question);
+
+                    // Increment round and save question to RoomQuiz
+                    room.setCurrentRound(room.getCurrentRound() + 1);
+                    RoomQuiz roomQuiz = new RoomQuiz();
+                    roomQuiz.setRoomId(room);
+                    roomQuiz.setQuizId(question);
+                    roomQuizRepository.save(roomQuiz);
+
+                    // Create PlayerAnswer entries for all players
+                    List<Player> players = playerRepository.findByRoomId(roomId);
+                    for (Player player : players) {
+                        PlayerAnswer playerAnswer = new PlayerAnswer();
+                        playerAnswer.setPlayerId(player);
+                        playerAnswer.setQuizId(roomQuiz);
+                        playerAnswer.setCorrect(false);
+                        playerAnswer.setAnswer(""); // Use empty string or placeholder
+                        playerAnswerRepository.save(playerAnswer);
+                    }
+                    roomRepository.save(room);
                     System.out.println("Sent question to room: " + roomId);
+
                 } catch (Exception e) {
-                    System.err.println("Error while broadcasting to room " + roomId + ": " + e.getMessage());
+                    System.err.println("Error while broadcasting to room " + roomId);
+                    e.printStackTrace();
                     stopBroadcasting(roomId);
                 }
-            }, 0, 30, TimeUnit.SECONDS);
+            }, 0, 3, TimeUnit.SECONDS); // Runs every 30 seconds
 
             return scheduler;
         });
     }
+
 
     public void stopBroadcasting(Long roomId) {
 

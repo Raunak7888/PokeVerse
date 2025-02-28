@@ -28,7 +28,6 @@ public class PlayerAnswer {
     @JoinColumn(name = "quiz_id", nullable = false)
     private RoomQuiz quizId;
 
-    @Column(nullable = false)
     private String answer;
 
     private boolean correct;

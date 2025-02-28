@@ -32,4 +32,6 @@ public class WebSocketController {
         wsService.sendQuestion(roomId, hostId);
     }
 
+//    @MessageMappi
+
 }
