@@ -1,6 +1,7 @@
 package com.pokequiz.quiz.controller;
 
 import com.pokequiz.quiz.dto.Message;
+import com.pokequiz.quiz.dto.WsAnswerValidationDTO;
 import com.pokequiz.quiz.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.*;
@@ -28,10 +29,19 @@ public class WebSocketController {
     }
 
     @MessageMapping("/game/{roomId}/{hostId}")
-    public void startGame(@DestinationVariable Long roomId, @DestinationVariable Long hostId) {
+    public void startQuestions(@DestinationVariable Long roomId, @DestinationVariable Long hostId) {
         wsService.sendQuestion(roomId, hostId);
     }
 
-//    @MessageMappi
+    @MessageMapping("/game/answer/validation")
+    public void validateAnswer(@Payload WsAnswerValidationDTO answer) {
+        wsService.validateAnswer(answer);
+    }
+
+    @MessageMapping("/game/stats/{roomId}")
+    public void sendStats(@DestinationVariable Long roomId) {
+        wsService.sendStats(roomId);
+    }
+
 
 }

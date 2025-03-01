@@ -61,4 +61,14 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query(value = "SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findRandomQuestion();
 
+    @Query("""
+    SELECT q FROM Question q 
+    WHERE (:excludedIds IS NULL OR q.id NOT IN :excludedIds) 
+    ORDER BY RANDOM() 
+    LIMIT 1
+""")
+    Question findRandomQuestionExcluding(@Param("excludedIds") List<Long> excludedIds);
+
+
+
 }

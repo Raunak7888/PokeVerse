@@ -22,11 +22,11 @@ public class PlayerAnswer {
 
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = false)
-    private Player playerId;
+    private Player player;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
-    private RoomQuiz quizId;
+    private RoomQuiz roomQuiz;
 
     private String answer;
 

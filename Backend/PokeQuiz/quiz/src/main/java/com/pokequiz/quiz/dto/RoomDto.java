@@ -12,8 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 public class RoomDto {
     private String name;
-    private Long hostId;
-    private Long maxPlayers;
+    private int hostId;
+    private String hostName;
+    private int maxPlayers;
     private int maxRound;
     private List<PlayerDto> players;
 }

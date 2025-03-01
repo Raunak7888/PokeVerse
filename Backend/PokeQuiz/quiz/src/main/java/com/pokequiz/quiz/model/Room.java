@@ -26,10 +26,11 @@ public class Room {
     private String name;
 
     @Column(nullable = false)
-    private Long hostId;
+    private int maxPlayers;
 
     @Column(nullable = false)
-    private Long maxPlayers;
+    private Long hostId;
+
 
     @Column(nullable = false)
     private boolean started;
@@ -43,7 +44,7 @@ public class Room {
     @JsonIgnore
     private List<Player> players;
 
-    @OneToMany(mappedBy = "roomId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<RoomQuiz> quizzes;
 

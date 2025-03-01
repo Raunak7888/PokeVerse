@@ -1,5 +1,6 @@
 package com.pokequiz.quiz.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,13 +24,14 @@ public class RoomQuiz {
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
-    private Question quizId;
+    private Question question;
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
-    private Room roomId;
+    private Room room;
 
-    @OneToMany(mappedBy = "quizId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "roomQuiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore // Ignore this field when serializing to JSON
     private List<PlayerAnswer> answers;
 
     @CreationTimestamp

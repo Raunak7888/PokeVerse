@@ -58,4 +58,9 @@ public class GameService {
     public Question getRandomQuiz() {
         return questionRepository.findRandomQuestion();
     }
+
+    public Question getRandomQuizExcluding(List<Long> excludedIds) {
+        return questionRepository.findRandomQuestionExcluding(excludedIds);
+    }
+
 }

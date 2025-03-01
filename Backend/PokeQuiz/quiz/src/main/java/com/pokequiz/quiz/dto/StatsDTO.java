@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlayerDto {
+public class StatsDTO {
     private Long userId;
-    private String name;
-    private int score;
-    private Long roomId;
-    private LocalDateTime createdAt;
+    private String username;
+    private int totalPoints;
+    private List<DetailedAnswer> detailedAnswers;
 }
+

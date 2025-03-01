@@ -22,12 +22,12 @@ public class RoomService {
         if (roomDto.getMaxPlayers() < 2 || roomDto.getMaxPlayers() > 4) {
             return ResponseEntity.badRequest().body("Max players must be between 2 and 4");
         }
-        if(roomRepository.findByNameAndHostId(roomDto.getName(), roomDto.getHostId()).isPresent()) {
+        if(roomRepository.findByNameAndHostId(roomDto.getName(), (long) roomDto.getHostId()).isPresent()) {
             return ResponseEntity.badRequest().body("Room with the same name already exists");
         }
         Room room = new Room();
         room.setName(roomDto.getName());
-        room.setHostId(roomDto.getHostId());
+        room.setHostId((long) roomDto.getHostId());
         room.setMaxPlayers(roomDto.getMaxPlayers());
         room.setStarted(false);
         room.setEnded(false);
