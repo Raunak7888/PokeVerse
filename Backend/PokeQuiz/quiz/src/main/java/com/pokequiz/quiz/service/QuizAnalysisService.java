@@ -139,7 +139,7 @@ public class QuizAnalysisService {
     }
 
     // Get all analyses for a user
-    public List<QuizAnalysis> getUserAnalyses(String userId) {
+    public List<QuizAnalysis> getUserAnalyses(Long userId) {
         return quizAnalysisRepository.findAllByUserId(userId);
     }
 }

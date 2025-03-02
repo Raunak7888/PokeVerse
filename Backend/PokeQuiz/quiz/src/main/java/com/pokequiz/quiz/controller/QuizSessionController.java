@@ -60,7 +60,7 @@ public class QuizSessionController {
 
     // 📌 Get active session for a user
     @GetMapping("/active/{userId}")
-    public ResponseEntity<QuizSession> getActiveSession(@PathVariable String userId) {
+    public ResponseEntity<QuizSession> getActiveSession(@PathVariable Long userId) {
         QuizSession activeSession = quizSessionService.findActiveSessionByUserId(userId);
         return activeSession != null ? ResponseEntity.ok(activeSession) : ResponseEntity.notFound().build();
     }

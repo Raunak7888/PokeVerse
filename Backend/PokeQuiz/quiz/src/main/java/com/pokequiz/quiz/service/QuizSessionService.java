@@ -57,7 +57,7 @@ public class QuizSessionService {
     }
 
     // 📌 Find active session for a user (IN_PROGRESS status only)
-    public QuizSession findActiveSessionByUserId(String userId) {
+    public QuizSession findActiveSessionByUserId(Long userId) {
         return quizSessionRepository.findByUserIdAndStatus(userId, QuizSession.SessionStatus.IN_PROGRESS);
     }
 }

@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface QuizAnalysisRepository extends JpaRepository<QuizAnalysis, Long> {
     Optional<QuizAnalysis> findBySessionId(Long sessionId);
-    List<QuizAnalysis> findAllByUserId(String userId);
+    List<QuizAnalysis> findAllByUserId(Long userId);
     List<QuizAnalysis> findAllByQuizType(String quizType);
     List<QuizAnalysis> findAllByDifficulty(String difficulty);
     List<QuizAnalysis> findAllByRegion(String region);
-    Optional<QuizAnalysis> findTopByUserIdOrderByCreatedAtDesc(String userId);
+    Optional<QuizAnalysis> findTopByUserIdOrderByCreatedAtDesc(Long userId);
 }

@@ -48,15 +48,5 @@ public class RoomController {
         return ResponseEntity.ok(roomService.allRooms());
     }
 
-    @PostMapping("/true")
-    public ResponseEntity<?> tru(@RequestParam Long roomId,@RequestParam int msg) {
-        return ResponseEntity.ok(roomService.setTrue(roomId,msg));
-    }
-
-    @PostMapping("/false")
-    public ResponseEntity<?> fal(@RequestParam Long roomId) {
-        return ResponseEntity.ok(roomService.setFalse(roomId));
-    }
-
 
 }

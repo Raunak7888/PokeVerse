@@ -136,7 +136,7 @@ public class WebSocketService {
                     e.printStackTrace();
                     stopBroadcasting(roomId);
                 }
-            }, 0, 3, TimeUnit.SECONDS); // Runs every 3 seconds
+            }, 0, 30, TimeUnit.SECONDS); // Runs every 3 seconds
 
             return scheduler;
         });

@@ -1,6 +1,5 @@
 package com.pokequiz.quiz.repository;
 
-import com.pokequiz.quiz.dto.StatsDTO;
 import com.pokequiz.quiz.model.Player;
 import com.pokequiz.quiz.model.PlayerAnswer;
 import com.pokequiz.quiz.model.RoomQuiz;
@@ -10,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 
 @Repository

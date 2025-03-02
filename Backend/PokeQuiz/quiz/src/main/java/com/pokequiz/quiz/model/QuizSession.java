@@ -21,7 +21,7 @@ public class QuizSession {
     private Long sessionId; // Ensure it's "sessionId" NOT "id"
 
     @Column(nullable = false)
-    private String userId;
+    private Long userId;
 
     @Column(nullable = false)
     private int score;

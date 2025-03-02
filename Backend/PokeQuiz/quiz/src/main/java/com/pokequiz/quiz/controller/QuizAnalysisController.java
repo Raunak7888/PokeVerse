@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/quiz-analysis")
+@RequestMapping("/api/analysis")
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 @RequiredArgsConstructor
 public class QuizAnalysisController {
@@ -30,7 +30,7 @@ public class QuizAnalysisController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserAnalyses(@PathVariable String userId) {
+    public ResponseEntity<?> getUserAnalyses(@PathVariable Long userId) {
         List<QuizAnalysis> analyses = quizAnalysisService.getUserAnalyses(userId);
         return ResponseEntity.ok(analyses);
     }

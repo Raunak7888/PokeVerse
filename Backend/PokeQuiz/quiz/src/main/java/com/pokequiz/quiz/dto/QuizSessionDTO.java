@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class QuizSessionDTO {
-    private Long sessionId;          // Matches entity ID
-    private String userId;           // User identifier
+    private Long userId;           // User identifier
     private String difficulty;       // Difficulty level
     private String region;           // Region of the quiz
     private String quizType;         // Type of quiz (e.g., trivia, battle, etc.)

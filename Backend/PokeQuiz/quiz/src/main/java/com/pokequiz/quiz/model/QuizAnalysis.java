@@ -24,7 +24,7 @@ public class QuizAnalysis {
     private Long sessionId;
 
     @Column(nullable = false)
-    private String userId; // User who completed the quiz
+    private Long userId; // User who completed the quiz
 
     @Column(nullable = false)
     private String quizType; // "TRIVIA", "PUZZLE", etc.
