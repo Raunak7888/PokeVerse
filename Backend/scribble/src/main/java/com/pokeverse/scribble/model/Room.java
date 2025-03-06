@@ -47,14 +47,18 @@ public class Room {
     @Column(name = "current_round")
     private int currentRound = 0;
 
+    @Column(name = "is_Started")
+    private boolean isStarted = false;
+
+    @Column(name = "is_ended")
+    private boolean isEnded = false;
+
     @OneToOne
     @JoinColumn(name = "current_player_id")
-    @JsonIgnore
     private Player drawer;
 
     // List of players in the room
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-
     private List<Player> players = new ArrayList<>();
 
     @CreationTimestamp
