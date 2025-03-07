@@ -13,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -134,6 +131,7 @@ public class RoundService {
         roomPlayersQueue.remove(room.getId()); // Cleanup
         roundDTOs.remove(room.getId()); // Cleanup
         sendMessage(room.getId(), "Game ended");
+        getStats(room.getId());
         logger.info("Game ended for room {}", room.getId());
     }
 
@@ -157,7 +155,7 @@ public class RoundService {
     }
 
     private void sendMessage(Long roomId, String message) {
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/game", message);
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/game", Map.of("message", message));
     }
 
     public void setWhatToGuess(Long roomId, RoundDTO dto) {
@@ -173,46 +171,78 @@ public class RoundService {
             }
             return oldDto; // Retain old if new is invalid
         });
+        int lengthOfWord = roundDTOs.get(roomId).getToGuess().length();
 
-        logger.info("Set word to guess for room {}: {}", roomId, dto);
+        // Send the length as a Map
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/game",
+                Map.of("lengthOfWord", lengthOfWord));
+        logger.info("Set word to guess for room {}: {}",roundDTOs.get(roomId).getToGuess(),roundDTOs.get(roomId));
     }
 
     private boolean isValid(RoundDTO dto) {
         return dto.getToGuess() != null && !dto.getToGuess().isEmpty();
     }
 
-    public RoundDTO getWhatToGuess(Long roomId) {
-        return roundDTOs.get(roomId);
+    public void getWhatToGuess(Long roomId) {
+        if (!roundDTOs.containsKey(roomId)) {
+            sendMessage(roomId, "Round not found for room: " + roomId);
+            return;
+        }
+
+        String toGuess = roundDTOs.get(roomId).getToGuess();
+        if (toGuess == null || toGuess.isEmpty()) {
+            sendMessage(roomId, "No word to guess.");
+            return;
+        }
+
+        // Get a random character and its position
+        Random random = new Random();
+        int randomIndex = random.nextInt(toGuess.length());
+        char randomChar = toGuess.charAt(randomIndex);
+
+        // Create a dynamic object using a Map
+        Map<String, Object> hintObject = new HashMap<>();
+        hintObject.put("roomId", roomId);
+        hintObject.put("hintChar", randomChar);
+        hintObject.put("position", randomIndex);
+
+        // Send the object
+        sendMessage3(roomId, hintObject);
     }
 
-    public AnswerDTO answerValidate(Long roomId, AnswerDTO dto) {
+    private void sendMessage3(Long roomId, Map<String, Object> hintObject) {
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/game" + hintObject);
+    }
+
+
+    public void answerValidate(Long roomId, AnswerDTO dto) {
         if (dto == null) {
             sendMessage(roomId, "Invalid payload.");
-            return null;
+            return;
         }
 
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found."));
 
         if (room.isEnded()) {
             sendMessage(roomId, "Game has ended.");
-            return null;
+            return;
         }
 
         if (room.getDrawer() == null || Objects.equals(room.getDrawer().getUserId(), dto.getUserId())) {
             sendMessage(roomId, "You are the drawer.");
-            return null;
+            return;
         }
 
         Player player = playerRepository.findByRoomIdAndUserId(roomId, dto.getUserId());
         if (player == null) {
             sendMessage(roomId, "Player not found.");
-            return null;
+            return;
         }
 
         RoundDTO roundDTO = roundDTOs.get(roomId);
         if (roundDTO == null || roundDTO.getToGuess() == null) {
             sendMessage(roomId, "No active round or word to guess.");
-            return null;
+            return;
         }
 
         // Validate the answer
@@ -224,14 +254,45 @@ public class RoundService {
             player.setScore(player.getScore() + points);
             playerRepository.save(player);
 
-            return new AnswerDTO(dto.getUserId(), dto.getAnswer(), points);
+            new AnswerDTO(dto.getUserId(), dto.getAnswer(), points);
         } else {
             sendMessage(roomId, player.getUsername() + " guessed: " + dto.getAnswer());
-            return new AnswerDTO(dto.getUserId(), dto.getAnswer(), 0); // Return with 0 points for incorrect guess
+            new AnswerDTO(dto.getUserId(), dto.getAnswer(), 0);
         }
     }
 
+    public void reset(){
+        Room room = roomRepository.findById(1L).orElseThrow();
+        room.setEnded(false);
+        room.setCurrentRound(0);
+        roomRepository.save(room);
+    }
 
 
+    public void getStats(Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found"));
+
+        List<Player> players = playerRepository.findByRoom(room);
+        if (players.isEmpty()) {
+            sendMessage(roomId, "No players found.");
+            return;
+        }
+
+        List<Map<String, Object>> playersStats = new ArrayList<>();
+
+        for (Player player : players) {
+            Map<String, Object> playerMap = new HashMap<>();
+            playerMap.put("userId", player.getUserId());
+            playerMap.put("username", player.getUsername());
+            playerMap.put("score", player.getScore());
+            playersStats.add(playerMap);
+        }
+
+        sendMessage2(roomId, playersStats);
+    }
+
+    private void sendMessage2(Long roomId, List<Map<String, Object>> playersStats) {
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/game", playersStats);
+    }
 
 }

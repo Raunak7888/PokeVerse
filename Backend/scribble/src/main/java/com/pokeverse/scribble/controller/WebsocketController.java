@@ -1,5 +1,6 @@
 package com.pokeverse.scribble.controller;
 
+import com.pokeverse.scribble.dto.AnswerDTO;
 import com.pokeverse.scribble.dto.MessageDTO;
 import com.pokeverse.scribble.dto.RoundDTO;
 import com.pokeverse.scribble.service.RoundService;
@@ -10,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,5 +40,15 @@ public class WebsocketController {
     public void setWhatToGuess(@DestinationVariable Long roomId,@Payload RoundDTO dto) {
         roundService.setWhatToGuess(roomId,dto);
     }
+    @MessageMapping("/game/round/{roomId}/get/guess")
+    public void getWhatToGuess(@DestinationVariable Long roomId) {
+        roundService.getWhatToGuess(roomId);
+    }
+
+    @MessageMapping("/game/round/{roomId}/answer")
+    public void answerQuestion(@DestinationVariable Long roomId,@Payload AnswerDTO dto) {
+        roundService.answerValidate(roomId,dto);
+    }
+
 
 }
