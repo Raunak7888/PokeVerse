@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.poke</groupId>
-	<artifactId>matrix</artifactId>
+	<artifactId>dex</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>matrix</name>
-	<description>Row and Column based Poke mon Game </description>
+	<name>dex</name>
+	<description>pokedex service for my pokeVerse</description>
 	<url/>
 	<licenses>
 		<license/>
