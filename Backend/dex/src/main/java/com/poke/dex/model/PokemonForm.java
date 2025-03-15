@@ -1,16 +1,14 @@
 package com.poke.dex.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "pokemon_forms")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(PokemonFormId.class)
+@IdClass(PokemonFormId.class) // ✅ Use IdClass for composite key
 public class PokemonForm {
     @Id
     @ManyToOne
@@ -18,11 +16,9 @@ public class PokemonForm {
     private Pokemon pokemon;
 
     @Id
-    private Integer formId;
+    private String formName; // ✅ Make this part of the composite key
 
     private String name;
-    private String formName;
     private Boolean isMega;
     private Boolean isGigantamax;
 }
-

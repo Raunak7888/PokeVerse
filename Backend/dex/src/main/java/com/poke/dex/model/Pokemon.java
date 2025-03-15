@@ -34,7 +34,4 @@ public class Pokemon {
     private String generation;
     private Boolean legendary;
     private Boolean mythical;
-
-    @OneToOne(mappedBy = "pokemon", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PokemonImage image;
 }
