@@ -1,14 +1,22 @@
-# Use OpenJDK 21 slim image
-FROM openjdk:21-jdk-slim
-
-# Set working directory
+# Build Stage (Multi-Stage Build for Smaller Image)
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy the JAR file (Ensure the JAR is built before this step)
-COPY target/dex-0.0.1-SNAPSHOT.jar dex-service.jar
+# Copy project files
+COPY . .
 
-# Expose port (Dynamic via ENV variable)
-EXPOSE 8084
+# Build the project without running tests
+RUN mvn clean package -DskipTests
 
-# Run Dex Service
-CMD ["java", "-jar", "dex-service.jar"]
+# Run Stage
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+
+# Copy built JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose the port (Pokédex Service)
+EXPOSE ${DEX_PORT}
+
+# Run the Pokédex Service with dynamic environment variables
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,10 +1,7 @@
 package com.poke.dex.repository;
 
-import com.poke.dex.dto.PokeDetailDto;
 import com.poke.dex.dto.PokemonCardDto;
-import com.poke.dex.dto.PokemonDto;
 import com.poke.dex.model.Pokemon;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

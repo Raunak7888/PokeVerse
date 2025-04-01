@@ -4,7 +4,6 @@ import com.poke.dex.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Data

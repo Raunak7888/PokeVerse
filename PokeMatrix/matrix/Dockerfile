@@ -1,14 +1,22 @@
-# Use OpenJDK 21 slim image
-FROM openjdk:21-jdk-slim
-
-# Set working directory
+# Build Stage (Multi-Stage Build for Smaller Image)
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy the JAR file (Ensure the JAR is built before this step)
-COPY target/matrix-0.0.1-SNAPSHOT.jar matrix-service.jar
+# Copy project files
+COPY . .
 
-# Expose port (Dynamic via ENV variable)
-EXPOSE 8083
+# Build the project without running tests
+RUN mvn clean package -DskipTests
 
-# Run Matrix Service
-CMD ["java", "-jar", "matrix-service.jar"]
+# Run Stage
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+
+# Copy built JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose the port (Matrix Service)
+EXPOSE ${MATRIX_PORT}
+
+# Run the Matrix Service with dynamic environment variables
+ENTRYPOINT ["java", "-jar", "app.jar"]

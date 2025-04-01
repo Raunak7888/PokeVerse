@@ -15,8 +15,8 @@ WORKDIR /app
 # Copy built JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose the port (Scribble Service)
-EXPOSE ${SCRIBBLE_PORT}
+# Expose the port (Quiz Service)
+EXPOSE ${QUIZ_PORT}
 
-# Run the Scribble Service with dynamic environment variables
+# Run the Quiz Service with dynamic environment variables
 ENTRYPOINT ["java", "-jar", "app.jar"]

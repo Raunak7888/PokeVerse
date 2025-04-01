@@ -10,7 +10,6 @@ import com.pokequiz.quiz.dto.WsAnswerValidationDTO;
 import com.pokequiz.quiz.model.*;
 import com.pokequiz.quiz.repository.*;
 import jakarta.persistence.Tuple;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
